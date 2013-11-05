@@ -4,7 +4,7 @@ import com.frame.Screen;
 
 /**
  * NukeSpawn class
- * @author nerdysweat
+ * @author Michael Morgan
  */
 public class NukeSpawn implements Runnable
 {
@@ -44,8 +44,20 @@ public class NukeSpawn implements Runnable
 	} //end of initVariables method
 	
 	/**
+	 * stop method
+	 */
+	@SuppressWarnings("deprecation")
+	public void stop()
+	{
+		run = false;
+		nukeLoop.stop();
+		nukeLoop = null;
+	} //end of stop method
+	
+	/**
 	 * run method
 	 */
+	@SuppressWarnings("static-access")
 	public void run()
 	{
 		while(run)
@@ -54,7 +66,7 @@ public class NukeSpawn implements Runnable
 			
 			try
 			{
-				nukeLoop.sleep(30000);
+				nukeLoop.sleep(60000);
 			}
 			catch(Exception e)
 			{

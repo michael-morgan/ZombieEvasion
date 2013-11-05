@@ -4,9 +4,8 @@ import com.frame.Frame;
 
 /**
  * Main class
- * @author nerdysweat
+ * @author Michael Morgan
  */
-
 public class Main
 {
 	/**

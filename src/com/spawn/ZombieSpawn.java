@@ -4,7 +4,7 @@ import com.frame.Screen;
 
 /**
  * ZombieSpawn class
- * @author nerdysweat
+ * @author Michael Morgan
  */
 public class ZombieSpawn implements Runnable
 {
@@ -69,10 +69,22 @@ public class ZombieSpawn implements Runnable
 			}
 		}
 	} //end of clean method
+	
+	/**
+	 * stop method
+	 */
+	@SuppressWarnings("deprecation")
+	public void stop()
+	{
+		run = false;
+		zombieLoop.stop();
+		zombieLoop = null;
+	} //end of stop method
 
 	/**
 	 * run method
 	 */
+	@SuppressWarnings("static-access")
 	public void run()
 	{
 		while(run)
@@ -82,7 +94,7 @@ public class ZombieSpawn implements Runnable
 
 			try
 			{
-				zombieLoop.sleep(400 - frequency);
+				zombieLoop.sleep(300 - frequency);
 			}
 			catch(Exception e)
 			{

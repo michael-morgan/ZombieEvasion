@@ -4,7 +4,7 @@ import com.frame.Screen;
 
 /**
  * HealthSpawn class
- * @author nerdysweat
+ * @author Michael Morgan
  */
 public class HealthSpawn implements Runnable
 {
@@ -44,8 +44,20 @@ public class HealthSpawn implements Runnable
 	} //end of initVariables method
 	
 	/**
+	 * stop method
+	 */
+	@SuppressWarnings("deprecation")
+	public void stop()
+	{
+		run = false;
+		healthLoop.stop();
+		healthLoop = null;
+	} //end of stop method
+	
+	/**
 	 * run method
 	 */
+	@SuppressWarnings("static-access")
 	public void run()
 	{
 		while(run)
@@ -54,7 +66,7 @@ public class HealthSpawn implements Runnable
 			
 			try
 			{
-				healthLoop.sleep(5000);
+				healthLoop.sleep(20000);
 			}
 			catch(Exception e)
 			{

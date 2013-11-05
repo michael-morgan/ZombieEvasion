@@ -5,13 +5,16 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import com.audio.Sound;
 import com.enemy.Zombie;
 import com.event.Key;
+import com.event.Mouse;
 import com.item.Health;
 import com.item.Nuke;
 import com.player.Player;
@@ -22,9 +25,8 @@ import com.time.Time;
 
 /**
  * Screen class
- * @author nerdysweat
+ * @author Michael Morgan
  */
-
 public class Screen extends JPanel implements Runnable
 {
 	/**
@@ -33,14 +35,17 @@ public class Screen extends JPanel implements Runnable
 	private static final long serialVersionUID = 1L;
 	
 	private Thread gameLoop;
-	private boolean run;
+	private boolean run, menu, game;
 	
 	private Frame frame;
 	
 	private Image dbImage;
 	private Graphics dbg;
 	
-	private Image layout;
+	private Image gameLayout, menuLayout;
+	
+	private Random random;
+	public Sound sound;
 	
 	public Player player;
 	public Time time;
@@ -60,9 +65,10 @@ public class Screen extends JPanel implements Runnable
 	{
 		this.frame = frame;
 		
-		init();
+		this.addKeyListener(new Key(this));
+		this.addMouseListener(new Mouse(this));
 		
-		addKeyListener(new Key(this));
+		init();
 	} //end of Screen constructor
 	
 	/**
@@ -71,6 +77,10 @@ public class Screen extends JPanel implements Runnable
 	private void init()
 	{
 		initVariables();
+		
+		startMenu();
+		
+		sound.playSound();
 		
 		gameLoop.start();
 		run = true;
@@ -84,7 +94,110 @@ public class Screen extends JPanel implements Runnable
 		gameLoop = new Thread(this);
 		run = false;
 		
-		layout = new ImageIcon("res/layout.png").getImage();
+		sound = new Sound();
+		random = new Random();
+		
+		menu = true;
+		game = false;
+	} //end of initVariables method
+	
+	/**
+	 * paint method
+	 * @param g
+	 */
+	@Override
+	public void paint(Graphics g)
+	{
+		dbImage = createImage(getWidth(), getHeight());
+		dbg = dbImage.getGraphics();
+		paintComponent(dbg);
+		g.drawImage(dbImage, 0, 0, this);
+	} //end of paint method
+	
+	/**
+	 * paintComponent class
+	 * @param g
+	 */
+	@Override
+	public void paintComponent(Graphics g)
+	{
+		if(menu)
+		{
+			g.drawImage(menuLayout, 0, 0, null);
+		}
+		else if(game)
+		{
+			g.drawImage(gameLayout, 0, 0, null);
+			
+			g.setColor(Color.RED);
+			g.setFont(new Font("Arial", Font.BOLD, 24));
+			
+			g.drawString("Zombies: ", 110, 645);
+			g.drawString("Survived: ", 280, 645);
+			g.drawString("Score: ", 460, 645);
+			g.drawString("Round: ", 600, 645);
+			
+			g.drawString("HP: ", 10, 645);
+			
+			if(player.getHealth() > 75)
+			{
+				g.setColor(Color.GREEN);
+				
+				g.drawImage(player.getPlayerFace(0), 800, 620, null);
+			}
+			else if(player.getHealth() > 50)
+			{
+				g.setColor(Color.YELLOW);
+				
+				g.drawImage(player.getPlayerFace(1), 800, 620, null);
+			}
+			else if(player.getHealth() > 25)
+			{
+				g.setColor(Color.ORANGE);
+				
+				g.drawImage(player.getPlayerFace(2), 800, 620, null);
+			}
+			else
+			{
+				g.setColor(Color.RED);
+				
+				g.drawImage(player.getPlayerFace(3), 800, 620, null);
+			}
+			
+			g.drawString("" + player.getHealth(), 55, 645);
+			
+			g.setColor(Color.GREEN);
+			
+			g.drawString("" + zombieSpawn.getZombieCount(), 220, 645);
+			g.drawString(time.getMinutes() + ":" + time.getSeconds(), 395, 645);
+			g.drawString("" + player.getPoints(), 540, 645);
+			g.drawString("" + player.getRound(), 690, 645);
+			
+			for(int i = 0; i < zombie.size(); i++)
+			{
+				zombie.get(i).paint(g);
+			}
+			
+			for(int i = 0; i < health.size(); i++)
+			{
+				health.get(i).paint(g);
+			}
+			
+			for(int i = 0; i < nuke.size(); i++)
+			{
+				nuke.get(i).paint(g);
+			}
+			
+			player.paint(g);
+		}
+	} //end of paintComponent method
+	
+	/**
+	 * startGame method
+	 */
+	public void startGame()
+	{	
+		gameLayout = new ImageIcon("res/layout.png").getImage();
 		
 		player = new Player();
 		time = new Time(this);
@@ -94,77 +207,67 @@ public class Screen extends JPanel implements Runnable
 		zombieSpawn = new ZombieSpawn(this);
 		healthSpawn = new HealthSpawn(this);
 		nukeSpawn = new NukeSpawn(this);
-	} //end of initVariables method
+		
+		menuLayout = null;
+		
+		menu = false;
+		game = true;
+	} //end of startGame method
 	
 	/**
-	 * paint method
-	 * @param g
+	 * startMenu method
 	 */
-	public void paint(Graphics g)
-	{
-		dbImage = createImage(getWidth(), getHeight());
-		dbg = dbImage.getGraphics();
-		paintComponent(dbg);
-		g.drawImage(dbImage, 0, 0, this);
-	} //end of pain method
+	public void startMenu()
+	{	
+		menuLayout = new ImageIcon("res/menu.png").getImage();
+		
+		if(game)
+		{
+			time.stop();
+			zombieSpawn.stop();
+			healthSpawn.stop();
+			nukeSpawn.stop();
+			gameLayout = null;
+			player = null;
+			time = null;
+			zombie = null;
+			health = null;
+			nuke = null;
+			zombieSpawn = null;
+			healthSpawn = null;
+			nukeSpawn = null;
+		}
+		
+		game = false;
+		menu = true;
+	} //end of startMenu method
 	
 	/**
-	 * paintComponent class
-	 * @param g
+	 * getGame method
+	 * @return game
 	 */
-	@Override
-	public void paintComponent(Graphics g)
+	public boolean getGame()
 	{
-		g.drawImage(layout, 0, 0, null);
-		
-		g.setColor(Color.RED);
-		g.setFont(new Font("Arial", Font.BOLD, 24));
-		
-		g.drawString("Zombies: ", 110, 645);
-		g.drawString("Survived: ", 280, 645);
-		g.drawString("Score: ", 460, 645);
-		
-		g.drawString("HP: ", 10, 645);
-		
-		if(player.getHealth() > 75)
-		{
-			g.setColor(Color.GREEN);
-			
-		}
-		else if(player.getHealth() > 50)
-		{
-			g.setColor(Color.YELLOW);
-		}
-		else if(player.getHealth() > 25)
-		{
-			g.setColor(Color.ORANGE);
-		}
-		
-		g.drawString("" + player.getHealth(), 55, 645);
-		
-		g.setColor(Color.GREEN);
-		
-		g.drawString("" + zombieSpawn.getZombieCount(), 220, 645);
-		g.drawString(time.getMinutes() + ":" + time.getSeconds(), 395, 645);
-		g.drawString("" + player.getPoints(), 540, 645);
-		
-		for(int i = 0; i < zombie.size(); i++)
-		{
-			zombie.get(i).paint(g);
-		}
-		
-		for(int i = 0; i < health.size(); i++)
-		{
-			health.get(i).paint(g);
-		}
-		
-		for(int i = 0; i < nuke.size(); i++)
-		{
-			nuke.get(i).paint(g);
-		}
-		
-		player.paint(g);
-	} //end of paintComponent method
+		return game;
+	} //end of getGame method
+	
+	/**
+	 * getMenu method
+	 * @return menu
+	 */
+	public boolean getMenu()
+	{
+		return menu;
+	} //end of getMenu method
+	
+	/**
+	 * getFrame method
+	 * @return frame
+	 */
+	public Frame getFrame()
+	{
+		return frame;
+	} //end of getFrame method
 	
 	/**
 	 * addZombie method
@@ -236,7 +339,6 @@ public class Screen extends JPanel implements Runnable
 		{
 			if((player.getPlayerX() == nuke.get(i).getNukeX()) && (player.getPlayerY() == nuke.get(i).getNukeY()))
 			{
-				System.out.println("Nuking!");
 				nuke.remove(i);
 				return true;
 			}
@@ -252,13 +354,7 @@ public class Screen extends JPanel implements Runnable
 	{
 		if(hit())
 		{
-			if(player.getHealth() <= 0)
-			{
-				run = false;
-				JOptionPane.showMessageDialog(frame, "Oh dear, you died!");
-				JOptionPane.showConfirmDialog(frame, "Play again?", "Zombie Evasion", JOptionPane.YES_NO_OPTION);
-			}
-			else
+			if(player.getHealth() > 0)
 			{
 				player.decrementHealth(1);
 			}
@@ -266,9 +362,13 @@ public class Screen extends JPanel implements Runnable
 		
 		if(heal())
 		{
-			if(player.getHealth() <= 95)
+			if(player.getHealth() <= 90)
 			{
-				player.incrementHealth(5);
+				player.incrementHealth(5 + random.nextInt(5));
+			}
+			else
+			{
+				player.setHealth(100);
 			}
 		}
 		
@@ -279,8 +379,13 @@ public class Screen extends JPanel implements Runnable
 				zombie.remove(i);
 				zombieSpawn.decrementCount(1);
 			}
-			
-			time.decrementSeconds(20);
+		}
+		
+		if(player.getHealth() <= 0)
+		{
+			repaint();
+			JOptionPane.showMessageDialog(frame, "Oh dear, the zombies found your flesh.");
+			startMenu();
 		}
 		
 	} //end of process method
@@ -288,11 +393,16 @@ public class Screen extends JPanel implements Runnable
 	/**
 	 * run method
 	 */
+	@SuppressWarnings("static-access")
 	public void run()
 	{
 		while(run)
 		{
-			process();	
+			if(game)
+			{
+				process();
+			}
+			
 			repaint();
 			try
 			{

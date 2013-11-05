@@ -1,18 +1,22 @@
 package com.item;
 
-import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.util.Random;
+
+import javax.swing.ImageIcon;
 
 /**
  * Health class
- * @author nerdysweat
+ * @author Michael Morgan
  */
 public class Health
 {	
 	private int healthX, healthY;
 	
 	private Random random;
+	
+	private Image health;
 	
 	/**
 	 * Health constructor
@@ -37,6 +41,8 @@ public class Health
 	{
 		random = new Random();
 		
+		health = new ImageIcon("res/health.png").getImage();
+		
 		healthX = random.nextInt(30) * 32;
 		healthY = random.nextInt(19) * 32;
 	} //end of initVariables method
@@ -47,8 +53,7 @@ public class Health
 	 */
 	public void paint(Graphics g)
 	{
-		g.setColor(Color.RED);
-		g.fillRect(healthX, healthY, 32, 32);
+		g.drawImage(health, healthX, healthY, null);
 	} //end of paint method
 	
 	/**

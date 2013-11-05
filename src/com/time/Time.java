@@ -6,7 +6,7 @@ import com.frame.Screen;
 
 /**
  * Time class
- * @author nerdysweat
+ * @author Michael Morgan
  */
 public class Time implements Runnable
 {
@@ -69,15 +69,32 @@ public class Time implements Runnable
 		
 		screen.player.incrementPoints(random.nextInt(3) + 1);
 		
-		if(minutes >= 1)
+		if(screen.player.getPoints() >= 100)
 		{
-			screen.zombieSpawn.setFrequency(minutes * 10);
+			if(screen.player.getPoints() <= 2500)
+			{
+				screen.zombieSpawn.setFrequency((screen.player.getPoints() / 100) * 10);
+			}
 		}
+		
+		screen.player.setRound((screen.player.getPoints() / 100) + 1);
 	} //end of process method
+	
+	/**
+	 * stop method
+	 */
+	@SuppressWarnings("deprecation")
+	public void stop()
+	{
+		run = false;
+		timeLoop.stop();
+		timeLoop = null;
+	} //end of stop method
 	
 	/**
 	 * run method
 	 */
+	@SuppressWarnings("static-access")
 	public void run()
 	{
 		while(run)

@@ -1,27 +1,30 @@
 package com.enemy;
 
-import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.util.Random;
 
-/**
- * Bug class
- * @author nerdysweat
- */
+import javax.swing.ImageIcon;
 
+/**
+ * Zombie class
+ * @author Michael Morgan
+ */
 public class Zombie
 {
 	private int zombieX, zombieY;
 	
+	private Image zombie;
+	
 	private Random random;
 	
 	/**
-	 * Bug constructor
+	 * Zombie constructor
 	 */
 	public Zombie()
 	{
 		init();
-	} //end of Bug constructor
+	} //end of Zombie constructor
 	
 	/**
 	 * init method
@@ -38,6 +41,8 @@ public class Zombie
 	{
 		random = new Random();
 		
+		zombie = new ImageIcon("res/zombie.png").getImage();
+		
 		zombieX = random.nextInt(30) * 32;
 		zombieY = random.nextInt(19) * 32;
 	} //end of initVariables method
@@ -48,8 +53,7 @@ public class Zombie
 	 */
 	public void paint(Graphics g)
 	{
-		g.setColor(Color.GREEN);
-		g.fillRect(zombieX, zombieY, 32, 32);
+		g.drawImage(zombie, zombieX, zombieY, null);
 	} //end of paint method
 	
 	/**

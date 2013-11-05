@@ -1,16 +1,21 @@
 package com.player;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
 
 /**
  * Player class
- * @author nerdysweat
+ * @author Michael Morgan
  */
 public class Player
 {
-	private int playerX, playerY, health, points;
+	private int playerX, playerY, health, points, round;
+	
+	private boolean left, right, up, down;
+	
+	private Image[] player, face;
 	
 	/**
 	 * Player constructor
@@ -25,10 +30,36 @@ public class Player
 	 */
 	private void init()
 	{
+		initVariables();
+	} //end of init method
+	
+	/**
+	 * initVariables method
+	 */
+	private void initVariables()
+	{
 		playerX = 448;
 		playerY = 288;
 		health = 100;
-	} //end of init method
+		round = 0;
+		
+		player = new Image[4];
+		player[0] = new ImageIcon("res/playerleft.png").getImage();
+		player[1] = new ImageIcon("res/playerright.png").getImage();
+		player[2] = new ImageIcon("res/playerback.png").getImage();
+		player[3] = new ImageIcon("res/playerfront.png").getImage();
+		
+		face = new Image[4];
+		face[0] = new ImageIcon("res/playerface1.png").getImage();
+		face[1] = new ImageIcon("res/playerface2.png").getImage();
+		face[2] = new ImageIcon("res/playerface3.png").getImage();
+		face[3] = new ImageIcon("res/playerface4.png").getImage();
+		
+		left = false;
+		right = false;
+		up = false;
+		down = true;
+	} //end of initVariables method
 	
 	/**
 	 * getPlayerX method
@@ -112,6 +143,15 @@ public class Player
 	} //end of getHealth method
 	
 	/**
+	 * setHealth method
+	 * @param amount
+	 */
+	public void setHealth(int amount)
+	{
+		health = amount;
+	} //end of setHealth method
+	
+	/**
 	 * incrementPoints method
 	 * @param amount
 	 */
@@ -130,13 +170,98 @@ public class Player
 	} //end of getPoints method
 	
 	/**
+	 * getPlayerFace method
+	 * @param number
+	 * @return face[number]
+	 */
+	public Image getPlayerFace(int number)
+	{
+		return face[number];
+	} //end of getPlayerFace method
+	
+	/**
+	 * setRound method
+	 * @param amount
+	 */
+	public void setRound(int amount)
+	{
+		round = amount;
+	} //end of setRound method
+	
+	/**
+	 * getRound method
+	 * @return round
+	 */
+	public int getRound()
+	{
+		return round;
+	} //end of getRound method
+	
+	/**
+	 * setLeft method
+	 */
+	public void setLeft()
+	{
+		left = true;
+	} //end of setLeft method
+	
+	/**
+	 * setRight method
+	 */
+	public void setRight()
+	{
+		right = true;
+	} //end of setRight method
+	
+	/**
+	 * setUp method
+	 */
+	public void setUp()
+	{
+		up = true;
+	} //end of setUp method
+	
+	/**
+	 * setDown method
+	 */
+	public void setDown()
+	{
+		down = true;
+	} //end of setDown method
+	
+	/**
+	 * resetPlayer method
+	 */
+	public void resetPlayer()
+	{
+		left = false;
+		right = false;
+		up = false;
+		down = false;
+	} //end of resetPlayer method
+	
+	/**
 	 * paint method
 	 * @param g
 	 */
 	public void paint(Graphics g)
 	{
-		g.setColor(Color.BLACK);
-		g.fillRect(playerX, playerY, 32, 32);
+		if(left)
+		{
+			g.drawImage(player[0], playerX, playerY, null);
+		}
+		else if(right)
+		{
+			g.drawImage(player[1], playerX, playerY, null);
+		}
+		else if(up)
+		{
+			g.drawImage(player[2], playerX, playerY, null);
+		}
+		else if(down)
+		{
+			g.drawImage(player[3], playerX, playerY, null);
+		}
 	} //end of paint method
 	
 } //end of Player class
